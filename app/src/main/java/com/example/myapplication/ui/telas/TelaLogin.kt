@@ -63,7 +63,6 @@ fun TelaLogin(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Imagem da Logo Oficial
             Image(
                 painter = painterResource(id = R.drawable.logo_codewords),
                 contentDescription = "Logo CodeWords",
@@ -74,7 +73,6 @@ fun TelaLogin(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Campo: Email ou Usuário
             OutlinedTextField(
                 value = emailOuUsuario,
                 onValueChange = { emailOuUsuario = it },
@@ -134,7 +132,6 @@ fun TelaLogin(
             }
         }
 
-        // Secção Inferior: Pergunta + Botão Cadastrar
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
