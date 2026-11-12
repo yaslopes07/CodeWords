@@ -116,6 +116,3 @@ Entre os dados armazenados estão:
 - **[Vitor Matheus Gauer](https://github.com/Vitor-Gauer)**
 - **[Yasmin da Rocha Lopes](https://github.com/yaslopes07)**
 
----
-
-🔤 **CodeWords — Encontre as palavras. Complete as fases. Supere seus desafios!**
