@@ -1,9 +1,9 @@
 package com.example.myapplication.data.repository
 
-import com.example.myapplication.data.local.dao.UsuarioDAO
+import com.example.myapplication.data.local.dao.usuarioDAO
 import com.example.myapplication.data.local.entity.UsuarioEntity
 
-class UsuarioRepository(private val usuarioDAO: UsuarioDAO){
+class UsuarioRepository(private val usuarioDAO: usuarioDAO){
 
     suspend fun fazerLogin(login: String, senha: String): UsuarioEntity? {
         return usuarioDAO.autenticar(login.trim(), senha)

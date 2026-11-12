@@ -1,7 +1,10 @@
-package com.example.cacapalavras.viewModel
+package com.example.myapplication.viewModel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.local.AppDatabase
+import com.example.myapplication.data.local.entity.ProgressoFaseEntity
 import com.example.myapplication.ui.state.Fase2UiState
 import com.example.myapplication.ui.state.PalavraFase
 import com.example.myapplication.ui.state.Posicao
@@ -13,9 +16,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class Fase2ViewModel : ViewModel() {
+class Fase2ViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val progressoDao = AppDatabase.getDatabase(application).progressoFaseDao()
+    private var usuarioIdAtual: Int = 0
+
     private val _uiState = MutableStateFlow(Fase2UiState())
     val uiState: StateFlow<Fase2UiState> = _uiState.asStateFlow()
+
     private var cronometroJob: Job? = null
     private var segundosDecorridos = 0
 
@@ -24,8 +32,11 @@ class Fase2ViewModel : ViewModel() {
         iniciarCronometro()
     }
 
-    private fun carregarFase2() {
+    fun definirUsuario(usuarioId: Int) {
+        usuarioIdAtual = usuarioId
+    }
 
+    private fun carregarFase2() {
         val matriz = listOf(
             listOf('C', 'O', 'D', 'I', 'G', 'O', 'X', 'X'),
             listOf('L', 'B', 'S', 'P', 'Q', 'K', 'V', 'X'),
@@ -45,31 +56,24 @@ class Fase2ViewModel : ViewModel() {
             PalavraFase("CODIGO", posicoes = listOf(
                 Posicao(0, 0), Posicao(0, 1), Posicao(0, 2), Posicao(0, 3), Posicao(0, 4), Posicao(0, 5)
             )),
-
             PalavraFase("CLASSE", posicoes = listOf(
                 Posicao(0, 0), Posicao(1, 0), Posicao(2, 0), Posicao(3, 0), Posicao(4, 0), Posicao(5, 0)
             )),
-
             PalavraFase("FUNCAO", posicoes = listOf(
                 Posicao(3, 2), Posicao(3, 3), Posicao(3, 4), Posicao(3, 5), Posicao(3, 6), Posicao(3, 7)
             )),
-
             PalavraFase("LOGICA", posicoes = listOf(
                 Posicao(2, 6), Posicao(2, 5), Posicao(2, 4), Posicao(2, 3), Posicao(2, 2), Posicao(2, 1)
             )),
-
             PalavraFase("VETOR", posicoes = listOf(
                 Posicao(7, 5), Posicao(7, 4), Posicao(7, 3), Posicao(7, 2), Posicao(7, 1)
             )),
-
             PalavraFase("OBJETO", posicoes = listOf(
                 Posicao(9, 1), Posicao(9, 2), Posicao(9, 3), Posicao(9, 4), Posicao(9, 5), Posicao(9, 6)
             )),
-
             PalavraFase("STRING", posicoes = listOf(
                 Posicao(11, 0), Posicao(11, 1), Posicao(11, 2), Posicao(11, 3), Posicao(11, 4), Posicao(11, 5)
             )),
-
             PalavraFase("DEBUG", posicoes = listOf(
                 Posicao(5, 7), Posicao(6, 7), Posicao(7, 7), Posicao(8, 7), Posicao(9, 7)
             ))
@@ -130,6 +134,20 @@ class Fase2ViewModel : ViewModel() {
                     val vitoria = novasPalavras.all { it.encontrada }
                     if (vitoria) {
                         cronometroJob?.cancel()
+                        if (usuarioIdAtual != 0) {
+                            val tempoFinalTexto = estadoAtual.tempoDecorrido
+                            val tempoFinalSegundos = segundosDecorridos
+                            viewModelScope.launch {
+                                progressoDao.salvarProgresso(
+                                    ProgressoFaseEntity(
+                                        usuarioId = usuarioIdAtual,
+                                        numeroFase = 2,
+                                        tempoSegundos = tempoFinalSegundos,
+                                        tempoFormatado = tempoFinalTexto
+                                    )
+                                )
+                            }
+                        }
                     }
 
                     _uiState.update {
@@ -146,19 +164,17 @@ class Fase2ViewModel : ViewModel() {
         }
     }
 
-    fun reiniciarFase(){
+    fun reiniciarFase() {
         segundosDecorridos = 0
-
         carregarFase2()
-
         _uiState.update {
             it.copy(
+                tempoDecorrido = "00:00",
                 posicoesSelecionada = emptyList(),
                 posicoesEncontradas = emptySet(),
                 mensagemVitoria = false
             )
         }
-
         iniciarCronometro()
     }
 

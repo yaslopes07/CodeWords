@@ -37,6 +37,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,15 +50,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.cacapalavras.viewModel.Fase3ViewModel
 import com.example.myapplication.ui.state.Fase3UiState
 import com.example.myapplication.ui.state.Posicao
+import com.example.myapplication.viewModel.Fase3ViewModel
 
 @Composable
 fun TelaFase3Route(
+    usuarioId: Int = 0,
     viewModel: Fase3ViewModel = viewModel(),
     onVoltarClick: () -> Unit = {}
 ) {
+    LaunchedEffect(usuarioId) {
+        viewModel.definirUsuario(usuarioId)
+    }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     TelaFase3(
@@ -74,7 +80,7 @@ fun TelaFase3(
     onVoltarClick: () -> Unit = {},
     onLetraClick: (Posicao) -> Unit = {},
     onRecomecarClick: () -> Unit = {}
-){
+) {
     val corFundo = Color(0xFF141E26)
     val corCardGrid = Color(0xFFEBF3FB)
     val corDoProgresso = Color(0xFF00E676)
@@ -179,11 +185,10 @@ fun TelaFase3(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-
                 val totalLinhas = uiState.matrizLetras.size
                 val totalColunas = if (totalLinhas > 0) uiState.matrizLetras[0].size else 0
 
-                itemsIndexed(uiState.matrizLetras.flatten()){ index, letra ->
+                itemsIndexed(uiState.matrizLetras.flatten()) { index, letra ->
                     val l = index / totalColunas
                     val c = index % totalColunas
                     val posicao = Posicao(l, c)
@@ -197,13 +202,13 @@ fun TelaFase3(
                             .padding(2.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(
-                                when{
+                                when {
                                     estaEncontrada -> corVerdeDestaque
                                     estaSelecionada -> Color(0xFF81C784)
                                     else -> Color.Transparent
                                 }
                             )
-                            .clickable{onLetraClick(posicao)},
+                            .clickable { onLetraClick(posicao) },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -243,7 +248,7 @@ fun TelaFase3(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(horizontal = 4.dp)
                 ) {
-                    items(uiState.palavras){item ->
+                    items(uiState.palavras) { item ->
                         Surface(
                             color = corAzulChip,
                             shape = CircleShape
@@ -261,58 +266,59 @@ fun TelaFase3(
                 }
             }
         }
+    }
 
-        if (uiState.mensagemVitoria) {
-            AlertDialog(
-                onDismissRequest = { /* Mantém aberto até clicar num botão */ },
-                containerColor = Color(0xFF1F2C34),
-                title = {
+    if (uiState.mensagemVitoria) {
+        AlertDialog(
+            onDismissRequest = { },
+            containerColor = Color(0xFF1F2C34),
+            title = {
+                Text(
+                    text = "🎉 Parabéns!",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(
-                        text = "🎉 Parabéns!",
-                        color = Color.White,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        text = "Você concluiu a ${uiState.numeroFase} com sucesso!",
+                        color = Color.LightGray,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
                     )
-                },
-                text = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "Você concluiu a ${uiState.numeroFase} com sucesso!",
-                            color = Color.LightGray,
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = "Tempo total: ${uiState.tempoDecorrido}",
-                            color = Color(0xFF00E676),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                },
-                confirmButton = {
-                    Button(
-                        onClick = onRecomecarClick,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E676))
-                    ) {
-                        Text("Recomeçar", color = Color.Black, fontWeight = FontWeight.Bold)
-                    }
-                },
-                dismissButton = {
-                    OutlinedButton(
-                        onClick = onVoltarClick,
-                        border = BorderStroke(1.dp, Color.White)
-                    ) {
-                        Text("Menu de Fases", color = Color.White)
-                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Tempo total: ${uiState.tempoDecorrido}",
+                        color = Color(0xFF00E676),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-            )
-        }
+            },
+            confirmButton = {
+                Button(
+                    onClick = onRecomecarClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E676))
+                ) {
+                    Text("Recomeçar", color = Color.Black, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = onVoltarClick,
+                    border = BorderStroke(1.dp, Color.White)
+                ) {
+                    Text("Menu de Fases", color = Color.White)
+                }
+            }
+        )
     }
 }
+

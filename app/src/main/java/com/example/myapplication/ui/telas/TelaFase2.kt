@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -46,27 +45,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.cacapalavras.viewModel.Fase2ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ui.state.Fase2UiState
 import com.example.myapplication.ui.state.Posicao
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.viewModel.Fase2ViewModel
 
 @Composable
 fun TelaFase2Route(
+    usuarioId: Int = 0,
     viewModel: Fase2ViewModel = viewModel(),
     onVoltarClick: () -> Unit = {}
 ) {
+    androidx.compose.runtime.LaunchedEffect(usuarioId) {
+        viewModel.definirUsuario(usuarioId)
+    }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     TelaFase2(
         uiState = uiState,
         onVoltarClick = onVoltarClick,
-        onLetraClick = {posicao -> viewModel.selecionarPosicao(posicao)},
-        onRecomecarClick = {viewModel.reiniciarFase()}
+        onLetraClick = { posicao -> viewModel.selecionarPosicao(posicao) },
+        onRecomecarClick = { viewModel.reiniciarFase() }
     )
 }
 @Composable

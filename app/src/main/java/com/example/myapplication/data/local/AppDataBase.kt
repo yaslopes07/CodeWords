@@ -4,14 +4,22 @@ import android.content.Context
 import androidx.room3.Database
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
-import com.example.myapplication.data.local.dao.UsuarioDAO
+import com.example.myapplication.data.local.dao.ProgressoFaseDao
+import com.example.myapplication.data.local.dao.usuarioDAO
+import com.example.myapplication.data.local.entity.ProgressoFaseEntity
 import com.example.myapplication.data.local.entity.UsuarioEntity
 
-@Database(entities = [UsuarioEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [UsuarioEntity::class, ProgressoFaseEntity::class],
+    version = 2,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun usuarioDAO(): UsuarioDAO
 
-    companion object{
+    abstract fun usuarioDao(): usuarioDAO
+    abstract fun progressoFaseDao(): ProgressoFaseDao
+
+    companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -21,7 +29,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "codewords_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

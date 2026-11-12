@@ -1,19 +1,24 @@
 package com.example.myapplication
 
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.data.local.AppDatabase
+import com.example.myapplication.data.local.entity.UsuarioEntity
 import com.example.myapplication.ui.telas.TelaCadastroRoute
 import com.example.myapplication.ui.telas.TelaFase2Route
+import com.example.myapplication.ui.telas.TelaFase3Route
+import com.example.myapplication.ui.telas.TelaFase4Route
 import com.example.myapplication.ui.telas.TelaLoginRoute
+import com.example.myapplication.ui.telas.TelaMenuFases
 import com.example.myapplication.ui.theme.MyApplicationTheme
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,20 +26,48 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                var telaAtual by remember { mutableStateOf("login") }
+                val context = LocalContext.current
+                val progressoDao = remember { AppDatabase.getDatabase(context).progressoFaseDao() }
 
+                var telaAtual by remember { mutableStateOf("login") }
+                var usuarioLogado by remember { mutableStateOf<UsuarioEntity?>(null) }
+                var fasesConcluidas by remember { mutableStateOf<Set<Int>>(emptySet()) }
+
+                // Atualiza a lista de fases concluídas sempre que voltar para o menu
+                LaunchedEffect(telaAtual, usuarioLogado) {
+                    val userId = usuarioLogado?.id ?: return@LaunchedEffect
+                    if (telaAtual == "menu_fases") {
+                        fasesConcluidas = progressoDao.buscarFasesConcluidasDoUsuario(userId).toSet()
+                    }
+                }
 
                 when (telaAtual) {
                     "login" -> TelaLoginRoute(
-                        onLoginSucesso = { telaAtual = "fase2" },
+                        onLoginSucesso = { usuario ->
+                            usuarioLogado = usuario
+                            telaAtual = "menu_fases"
+                        },
                         onCadastrarClick = { telaAtual = "cadastro" }
                     )
                     "cadastro" -> TelaCadastroRoute(
                         onCadastroSucesso = { telaAtual = "login" },
                         onVoltarLoginClick = { telaAtual = "login" }
                     )
+                    "menu_fases" -> TelaMenuFases(
+                        fasesConcluidas = fasesConcluidas,
+                        onFaseClick = { numeroFase ->
+                            telaAtual = "fase$numeroFase"
+                        }
+                    )
                     "fase2" -> TelaFase2Route(
-                        onVoltarClick = { telaAtual = "login" }
+                        usuarioId = usuarioLogado?.id ?: 0,
+                        onVoltarClick = { telaAtual = "menu_fases" }
+                    )
+                    "fase3" -> TelaFase3Route(
+                        onVoltarClick = { telaAtual = "menu_fases" }
+                    )
+                    "fase4" -> TelaFase4Route(
+                        onVoltarClick = { telaAtual = "menu_fases" }
                     )
                 }
             }

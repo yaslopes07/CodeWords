@@ -1,7 +1,10 @@
 package com.example.myapplication.viewModel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.local.AppDatabase
+import com.example.myapplication.data.local.entity.ProgressoFaseEntity
 import com.example.myapplication.ui.state.Fase4UiState
 import com.example.myapplication.ui.state.PalavraFase
 import com.example.myapplication.ui.state.Posicao
@@ -19,15 +22,24 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-class Fase4ViewModel : ViewModel() {
+class Fase4ViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val progressoDao = AppDatabase.getDatabase(application).progressoFaseDao()
+    private var usuarioIdAtual: Int = 0
+
     private val _uiState = MutableStateFlow(Fase4UiState())
     val uiState: StateFlow<Fase4UiState> = _uiState.asStateFlow()
+
     private var cronometroJob: Job? = null
     private var segundosDecorridos = 0
 
     init {
         carregarFase4()
         iniciarCronometro()
+    }
+
+    fun definirUsuario(usuarioId: Int) {
+        usuarioIdAtual = usuarioId
     }
 
     private fun carregarFase4() {
@@ -102,29 +114,22 @@ class Fase4ViewModel : ViewModel() {
 
     // ---------- Seleção por arrastar (marca-texto) ----------
 
-    /** Dedo encostou na tela: começa a seleção na célula tocada. */
     fun iniciarSelecao(posicao: Posicao) {
         if (_uiState.value.mensagemVitoria) return
         _uiState.update { it.copy(posicoesSelecionada = listOf(posicao)) }
     }
 
-    /** Dedo se mexendo: a seleção vira uma linha reta da célula inicial até a célula atual. */
     fun arrastarSelecao(posicao: Posicao) {
         val inicio = _uiState.value.posicoesSelecionada.firstOrNull() ?: return
         _uiState.update { it.copy(posicoesSelecionada = calcularLinha(inicio, posicao)) }
     }
 
-    /** Dedo soltou: confere se o que foi marcado é uma palavra. */
     fun finalizarSelecao() {
         val selecionadas = _uiState.value.posicoesSelecionada
         if (selecionadas.isNotEmpty()) verificarPalavraFormada(selecionadas)
         _uiState.update { it.copy(posicoesSelecionada = emptyList()) }
     }
 
-    /**
-     * Só existem 8 direções (horizontal, vertical e diagonais). Então "encaixamos" o arrasto
-     * na direção mais próxima, pra seleção nunca ficar torta.
-     */
     private fun calcularLinha(inicio: Posicao, fim: Posicao): List<Posicao> {
         val dl = fim.linha - inicio.linha
         val dc = fim.coluna - inicio.coluna
@@ -154,7 +159,6 @@ class Fase4ViewModel : ViewModel() {
         val estadoAtual = _uiState.value
         val conjuntoSelecionado = selecionadas.toSet()
 
-        // Compara por posições (e não só pelo texto), então vale nos dois sentidos do arrasto
         val palavra = estadoAtual.palavras.firstOrNull {
             !it.encontrada && it.posicoes.toSet() == conjuntoSelecionado
         } ?: return
@@ -164,7 +168,24 @@ class Fase4ViewModel : ViewModel() {
         }
         val novasEncontradas = estadoAtual.posicoesEncontradas + palavra.posicoes
         val vitoria = novasPalavras.all { it.encontrada }
-        if (vitoria) cronometroJob?.cancel()
+
+        if (vitoria) {
+            cronometroJob?.cancel()
+            if (usuarioIdAtual != 0) {
+                val tempoFinalTexto = estadoAtual.tempoDecorrido
+                val tempoFinalSegundos = segundosDecorridos
+                viewModelScope.launch {
+                    progressoDao.salvarProgresso(
+                        ProgressoFaseEntity(
+                            usuarioId = usuarioIdAtual,
+                            numeroFase = 4,
+                            tempoSegundos = tempoFinalSegundos,
+                            tempoFormatado = tempoFinalTexto
+                        )
+                    )
+                }
+            }
+        }
 
         _uiState.update {
             it.copy(

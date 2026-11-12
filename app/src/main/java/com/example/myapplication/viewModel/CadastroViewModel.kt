@@ -25,7 +25,7 @@ class CadastroViewModel(application: Application) : AndroidViewModel(application
 
 
     init {
-        val dao = AppDatabase.getDatabase(application).usuarioDAO()
+        val dao = AppDatabase.getDatabase(application).usuarioDao()
         repository = UsuarioRepository(dao)
     }
 

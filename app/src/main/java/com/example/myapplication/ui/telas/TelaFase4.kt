@@ -37,6 +37,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +50,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,26 +59,18 @@ import com.example.myapplication.ui.state.PalavraFase
 import com.example.myapplication.ui.state.Posicao
 import com.example.myapplication.viewModel.Fase4ViewModel
 
-/*
- * TelaFase4.kt  —  Fase 4 | 8X12  (tema: Análise de Sistemas)
- *
- * Organização do arquivo (de cima para baixo):
- *   1. TelaFase4Route  -> "liga" a tela ao ViewModel (só pega o estado e repassa os eventos)
- *   2. TelaFase4       -> monta a tela juntando os blocos abaixo (não tem lógica, só layout)
- *   3. Blocos da tela  -> Cabecalho, BarraProgresso, Tabuleiro, ListaPalavras, DialogVitoria
- *   4. desenharMarcaTexto -> função que desenha o "marca-texto" em cima das letras
- *
- * Fluxo de dados (MVVM):  ViewModel -> uiState -> Tela   |   Tela -> eventos -> ViewModel
- */
-
 // ============================== 1. ROUTE ==============================
 
-/** Conecta a tela ao ViewModel. A tela em si (TelaFase4) não conhece o ViewModel. */
 @Composable
 fun TelaFase4Route(
+    usuarioId: Int = 0,
     viewModel: Fase4ViewModel = viewModel(),
     onVoltarClick: () -> Unit = {}
 ) {
+    LaunchedEffect(usuarioId) {
+        viewModel.definirUsuario(usuarioId)
+    }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     TelaFase4(
@@ -135,7 +127,6 @@ fun TelaFase4(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Cartão do tabuleiro: ocupa todo o espaço que sobrar (weight = 1f)
         Surface(
             modifier = Modifier
                 .weight(1f)
@@ -155,21 +146,20 @@ fun TelaFase4(
         Spacer(modifier = Modifier.height(12.dp))
 
         ListaPalavras(palavras = uiState.palavras)
+    }
 
-        if (uiState.mensagemVitoria) {
-            DialogVitoria(
-                numeroFase = uiState.numeroFase,
-                tempo = uiState.tempoDecorrido,
-                onRecomecarClick = onRecomecarClick,
-                onVoltarClick = onVoltarClick
-            )
-        }
+    if (uiState.mensagemVitoria) {
+        DialogVitoria(
+            numeroFase = uiState.numeroFase,
+            tempo = uiState.tempoDecorrido,
+            onRecomecarClick = onRecomecarClick,
+            onVoltarClick = onVoltarClick
+        )
     }
 }
 
 // ============================== 3. BLOCOS ==============================
 
-/** Linha do topo: seta de voltar + nome da fase à esquerda, cronômetro à direita. */
 @Composable
 private fun Cabecalho(
     numeroFase: String,
@@ -217,7 +207,6 @@ private fun Cabecalho(
     }
 }
 
-/** Barra verde que enche conforme as palavras são encontradas (progresso vai de 0f a 1f). */
 @Composable
 private fun BarraProgresso(progresso: Float, texto: String) {
     Box(
@@ -245,12 +234,6 @@ private fun BarraProgresso(progresso: Float, texto: String) {
     }
 }
 
-/**
- * Tabuleiro do caça-palavras. É feito em 2 camadas empilhadas:
- *   - atrás : Canvas que desenha os traços do marca-texto
- *   - frente: as letras (Column de Rows)
- * O gesto de arrastar é detectado no Box de fora, que converte o ponto tocado em (linha, coluna).
- */
 @Composable
 private fun Tabuleiro(
     uiState: Fase4UiState,
@@ -259,20 +242,18 @@ private fun Tabuleiro(
     onFimSelecao: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val corMarcaEncontrada = Color(0xFF00E676).copy(alpha = 0.35f) // verde: palavra já achada
-    val corMarcaSelecao = Color(0xFF2979FF).copy(alpha = 0.35f)    // azul: seleção em andamento
+    val corMarcaEncontrada = Color(0xFF00E676).copy(alpha = 0.35f)
+    val corMarcaSelecao = Color(0xFF2979FF).copy(alpha = 0.35f)
 
     val matriz = uiState.matrizLetras
     val totalLinhas = matriz.size
     val totalColunas = matriz.firstOrNull()?.size ?: 0
-    if (totalLinhas == 0 || totalColunas == 0) return // dados ainda não carregaram
+    if (totalLinhas == 0 || totalColunas == 0) return
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        // Tamanho (em pixels) de cada célula: área total dividida pela quantidade de linhas/colunas
         val celulaLargura = constraints.maxWidth / totalColunas.toFloat()
         val celulaAltura = constraints.maxHeight / totalLinhas.toFloat()
 
-        // Transforma um ponto da tela (x, y) na célula (linha, coluna) correspondente
         fun posicaoDe(ponto: Offset) = Posicao(
             linha = (ponto.y / celulaAltura).toInt().coerceIn(0, totalLinhas - 1),
             coluna = (ponto.x / celulaLargura).toInt().coerceIn(0, totalColunas - 1)
@@ -282,7 +263,6 @@ private fun Tabuleiro(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(celulaLargura, celulaAltura) {
-                    // Um gesto completo: encostar -> arrastar -> soltar
                     awaitEachGesture {
                         val toque = awaitFirstDown()
                         onInicioSelecao(posicaoDe(toque.position))
@@ -290,11 +270,10 @@ private fun Tabuleiro(
                             mudanca.consume()
                             onArrastarSelecao(posicaoDe(mudanca.position))
                         }
-                        onFimSelecao() // dedo levantou
+                        onFimSelecao()
                     }
                 }
         ) {
-            // Camada de trás: marca-texto
             Canvas(modifier = Modifier.fillMaxSize()) {
                 uiState.palavras
                     .filter { it.encontrada }
@@ -320,7 +299,6 @@ private fun Tabuleiro(
                 }
             }
 
-            // Camada da frente: letras (cada linha/célula divide o espaço igualmente com weight)
             Column(modifier = Modifier.fillMaxSize()) {
                 matriz.forEach { linha ->
                     Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
@@ -344,7 +322,6 @@ private fun Tabuleiro(
     }
 }
 
-/** Lista horizontal (com scroll) de todas as palavras; as já encontradas ficam riscadas. */
 @Composable
 private fun ListaPalavras(palavras: List<PalavraFase>) {
     val corAzulChip = Color(0xFFD6E8FA)
@@ -390,7 +367,6 @@ private fun ListaPalavras(palavras: List<PalavraFase>) {
     }
 }
 
-/** Pop-up que aparece quando todas as palavras foram encontradas. */
 @Composable
 private fun DialogVitoria(
     numeroFase: String,
@@ -399,7 +375,7 @@ private fun DialogVitoria(
     onVoltarClick: () -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = { /* Mantém aberto até clicar num botão */ },
+        onDismissRequest = { },
         containerColor = Color(0xFF1F2C34),
         title = {
             Text(
@@ -452,10 +428,6 @@ private fun DialogVitoria(
 
 // ============================== 4. DESENHO ==============================
 
-/**
- * Desenha um traço arredondado (estilo marca-texto) do centro da célula inicial
- * até o centro da célula final.
- */
 private fun DrawScope.desenharMarcaTexto(
     inicio: Posicao,
     fim: Posicao,
@@ -468,7 +440,6 @@ private fun DrawScope.desenharMarcaTexto(
     val pontoFinal = Offset((fim.coluna + 0.5f) * celulaLargura, (fim.linha + 0.5f) * celulaAltura)
 
     if (inicio == fim) {
-        // Seleção de uma célula só: desenha uma bolinha
         drawCircle(color = cor, radius = espessura / 2f, center = pontoInicial)
     } else {
         drawLine(
@@ -480,3 +451,6 @@ private fun DrawScope.desenharMarcaTexto(
         )
     }
 }
+
+
+

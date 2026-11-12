@@ -20,7 +20,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     init {
-        val dao = AppDatabase.getDatabase(application).usuarioDAO()
+        val dao = AppDatabase.getDatabase(application).usuarioDao()
         repository = UsuarioRepository(dao)
     }
 

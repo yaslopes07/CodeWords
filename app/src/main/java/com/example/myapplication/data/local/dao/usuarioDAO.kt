@@ -7,7 +7,7 @@ import androidx.room3.Query
 import com.example.myapplication.data.local.entity.UsuarioEntity
 
 @Dao
-interface UsuarioDAO {
+interface usuarioDAO {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun inserirUsuario(usuario: UsuarioEntity): Long
