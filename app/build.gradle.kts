@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -55,5 +56,19 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation("androidx.compose.material:material-icons-extended")
 
+    val room_version = "3.0.3"
+    val lifecycle_version = "2.8.7"
+
+    implementation("androidx.room3:room3-runtime:$room_version")
+    ksp("androidx.room3:room3-compiler:$room_version")
+
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle_version}")
+// Integração do ViewModel com Jetpack Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:${lifecycle_version}")
+// Coleta seguro de StateFlow no ciclo de vida do Compose
+// (necessário para o collectAsStateWithLifecycle)
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:${lifecycle_version}")
 }
