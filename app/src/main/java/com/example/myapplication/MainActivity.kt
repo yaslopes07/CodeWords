@@ -67,7 +67,6 @@ class MainActivity : ComponentActivity() {
                         onPerfilClick = { telaAtual = "perfil" }
                     )
                     "perfil" -> {
-                        // Aqui vamos conectar a TelaPerfilRoute assim que você mandar o código dela!
                     }
                     "fase2" -> TelaFase2Route(
                         usuarioId = usuarioLogado?.id ?: 0,

@@ -1,18 +1,15 @@
 package com.example.myapplication.ui.telas
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +19,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,11 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -58,8 +54,6 @@ import com.example.myapplication.ui.state.Fase4UiState
 import com.example.myapplication.ui.state.PalavraFase
 import com.example.myapplication.ui.state.Posicao
 import com.example.myapplication.viewModel.Fase4ViewModel
-
-// ============================== 1. ROUTE ==============================
 
 @Composable
 fun TelaFase4Route(
@@ -76,22 +70,16 @@ fun TelaFase4Route(
     TelaFase4(
         uiState = uiState,
         onVoltarClick = onVoltarClick,
-        onInicioSelecao = { posicao -> viewModel.iniciarSelecao(posicao) },
-        onArrastarSelecao = { posicao -> viewModel.arrastarSelecao(posicao) },
-        onFimSelecao = { viewModel.finalizarSelecao() },
+        onLetraClick = { posicao -> viewModel.selecionarPosicao(posicao) },
         onRecomecarClick = { viewModel.reiniciarFase() }
     )
 }
-
-// ============================== 2. TELA ==============================
 
 @Composable
 fun TelaFase4(
     uiState: Fase4UiState,
     onVoltarClick: () -> Unit = {},
-    onInicioSelecao: (Posicao) -> Unit = {},
-    onArrastarSelecao: (Posicao) -> Unit = {},
-    onFimSelecao: () -> Unit = {},
+    onLetraClick: (Posicao) -> Unit = {},
     onRecomecarClick: () -> Unit = {}
 ) {
     val corFundo = Color(0xFF141E26)
@@ -136,9 +124,7 @@ fun TelaFase4(
         ) {
             Tabuleiro(
                 uiState = uiState,
-                onInicioSelecao = onInicioSelecao,
-                onArrastarSelecao = onArrastarSelecao,
-                onFimSelecao = onFimSelecao,
+                onLetraClick = onLetraClick,
                 modifier = Modifier.padding(8.dp)
             )
         }
@@ -157,8 +143,6 @@ fun TelaFase4(
         )
     }
 }
-
-// ============================== 3. BLOCOS ==============================
 
 @Composable
 private fun Cabecalho(
@@ -237,86 +221,50 @@ private fun BarraProgresso(progresso: Float, texto: String) {
 @Composable
 private fun Tabuleiro(
     uiState: Fase4UiState,
-    onInicioSelecao: (Posicao) -> Unit,
-    onArrastarSelecao: (Posicao) -> Unit,
-    onFimSelecao: () -> Unit,
+    onLetraClick: (Posicao) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val corMarcaEncontrada = Color(0xFF00E676).copy(alpha = 0.35f)
-    val corMarcaSelecao = Color(0xFF2979FF).copy(alpha = 0.35f)
+    val corVerdeDestaque = Color(0xFFA5D6A7)
+    val corVerdeSelecao = Color(0xFF81C784)
 
-    val matriz = uiState.matrizLetras
-    val totalLinhas = matriz.size
-    val totalColunas = matriz.firstOrNull()?.size ?: 0
-    if (totalLinhas == 0 || totalColunas == 0) return
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(8),
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        val totalLinhas = uiState.matrizLetras.size
+        val totalColunas = if (totalLinhas > 0) uiState.matrizLetras[0].size else 0
 
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val celulaLargura = constraints.maxWidth / totalColunas.toFloat()
-        val celulaAltura = constraints.maxHeight / totalLinhas.toFloat()
+        itemsIndexed(uiState.matrizLetras.flatten()) { index, letra ->
+            val l = index / totalColunas
+            val c = index % totalColunas
+            val posicao = Posicao(l, c)
 
-        fun posicaoDe(ponto: Offset) = Posicao(
-            linha = (ponto.y / celulaAltura).toInt().coerceIn(0, totalLinhas - 1),
-            coluna = (ponto.x / celulaLargura).toInt().coerceIn(0, totalColunas - 1)
-        )
+            val estaSelecionada = uiState.posicoesSelecionada.contains(posicao)
+            val estaEncontrada = uiState.posicoesEncontradas.contains(posicao)
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .pointerInput(celulaLargura, celulaAltura) {
-                    awaitEachGesture {
-                        val toque = awaitFirstDown()
-                        onInicioSelecao(posicaoDe(toque.position))
-                        drag(toque.id) { mudanca ->
-                            mudanca.consume()
-                            onArrastarSelecao(posicaoDe(mudanca.position))
+            Box(
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .padding(2.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(
+                        when {
+                            estaEncontrada -> corVerdeDestaque
+                            estaSelecionada -> Color(0xFF93C5FD)
+                            else -> Color.Transparent
                         }
-                        onFimSelecao()
-                    }
-                }
-        ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                uiState.palavras
-                    .filter { it.encontrada }
-                    .forEach { palavra ->
-                        desenharMarcaTexto(
-                            inicio = palavra.posicoes.first(),
-                            fim = palavra.posicoes.last(),
-                            celulaLargura = celulaLargura,
-                            celulaAltura = celulaAltura,
-                            cor = corMarcaEncontrada
-                        )
-                    }
-
-                val selecao = uiState.posicoesSelecionada
-                if (selecao.isNotEmpty()) {
-                    desenharMarcaTexto(
-                        inicio = selecao.first(),
-                        fim = selecao.last(),
-                        celulaLargura = celulaLargura,
-                        celulaAltura = celulaAltura,
-                        cor = corMarcaSelecao
                     )
-                }
-            }
-
-            Column(modifier = Modifier.fillMaxSize()) {
-                matriz.forEach { linha ->
-                    Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                        linha.forEach { letra ->
-                            Box(
-                                modifier = Modifier.weight(1f).fillMaxHeight(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = letra.toString(),
-                                    color = Color.Black,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-                }
+                    .clickable { onLetraClick(posicao) },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = letra.toString(),
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -338,7 +286,7 @@ private fun ListaPalavras(palavras: List<PalavraFase>) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Palavras Encontradas:",
+                text = "Palavras Encontradas: ",
                 color = Color.Black,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold
@@ -425,32 +373,3 @@ private fun DialogVitoria(
         }
     )
 }
-
-// ============================== 4. DESENHO ==============================
-
-private fun DrawScope.desenharMarcaTexto(
-    inicio: Posicao,
-    fim: Posicao,
-    celulaLargura: Float,
-    celulaAltura: Float,
-    cor: Color
-) {
-    val espessura = minOf(celulaLargura, celulaAltura) * 0.8f
-    val pontoInicial = Offset((inicio.coluna + 0.5f) * celulaLargura, (inicio.linha + 0.5f) * celulaAltura)
-    val pontoFinal = Offset((fim.coluna + 0.5f) * celulaLargura, (fim.linha + 0.5f) * celulaAltura)
-
-    if (inicio == fim) {
-        drawCircle(color = cor, radius = espessura / 2f, center = pontoInicial)
-    } else {
-        drawLine(
-            color = cor,
-            start = pontoInicial,
-            end = pontoFinal,
-            strokeWidth = espessura,
-            cap = StrokeCap.Round
-        )
-    }
-}
-
-
-

@@ -267,7 +267,7 @@ fun TelaFase2(
         }
         if (uiState.mensagemVitoria) {
             AlertDialog(
-                onDismissRequest = { /* Mantém aberto até clicar num botão */ },
+                onDismissRequest = { },
                 containerColor = Color(0xFF1F2C34),
                 title = {
                     Text(

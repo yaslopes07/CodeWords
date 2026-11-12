@@ -134,7 +134,7 @@ fun TelaRanking(
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Cabeçalho com título centralizado e ícone dourado à direita
+
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -157,7 +157,6 @@ fun TelaRanking(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // Cartão branco principal
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -206,7 +205,6 @@ private fun LinhaRanking(item: ItemRankingFase) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            // Medalhas para 1º, 2º e 3º lugares; número para os demais
             Box(
                 modifier = Modifier.width(36.dp),
                 contentAlignment = Alignment.Center
@@ -215,19 +213,19 @@ private fun LinhaRanking(item: ItemRankingFase) {
                     1 -> Icon(
                         imageVector = Icons.Filled.MilitaryTech,
                         contentDescription = "1º Lugar",
-                        tint = Color(0xFFEAB308), // Ouro
+                        tint = Color(0xFFEAB308),
                         modifier = Modifier.size(32.dp)
                     )
                     2 -> Icon(
                         imageVector = Icons.Filled.MilitaryTech,
                         contentDescription = "2º Lugar",
-                        tint = Color(0xFF94A3B8), // Prata
+                        tint = Color(0xFF94A3B8),
                         modifier = Modifier.size(32.dp)
                     )
                     3 -> Icon(
                         imageVector = Icons.Filled.MilitaryTech,
                         contentDescription = "3º Lugar",
-                        tint = Color(0xFFB45309), // Bronze
+                        tint = Color(0xFFB45309),
                         modifier = Modifier.size(32.dp)
                     )
                     else -> Text(
