@@ -94,7 +94,6 @@ fun TelaPerfil(
             .fillMaxSize()
             .background(corFundo)
     ) {
-        // Área com Scroll
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -102,7 +101,6 @@ fun TelaPerfil(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Cabeçalho Superior
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = corHeader,
@@ -126,7 +124,6 @@ fun TelaPerfil(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Avatar do Utilizador
             Box(
                 modifier = Modifier
                     .size(100.dp)
@@ -144,7 +141,6 @@ fun TelaPerfil(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Nome e Tag de Status
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -179,7 +175,6 @@ fun TelaPerfil(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Progresso de Nível
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -205,7 +200,6 @@ fun TelaPerfil(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Secção: Minhas estatísticas
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -224,7 +218,6 @@ fun TelaPerfil(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Card 1: Melhor Tempo Geral
                     Surface(
                         modifier = Modifier.weight(1f),
                         color = corCardEstatistica,
@@ -256,7 +249,6 @@ fun TelaPerfil(
                         }
                     }
 
-                    // Card 2: Fases Concluídas
                     Surface(
                         modifier = Modifier.weight(1f),
                         color = corCardEstatistica,
@@ -292,7 +284,6 @@ fun TelaPerfil(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Secção: Progresso das fases
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -320,7 +311,6 @@ fun TelaPerfil(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // Botão Sair da conta
             OutlinedButton(
                 onClick = onSairClick,
                 modifier = Modifier
@@ -350,7 +340,6 @@ fun TelaPerfil(
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        // Linha divisória e Barra de Navegação Inferior
         HorizontalDivider(color = corVerde, thickness = 1.dp)
 
         Row(

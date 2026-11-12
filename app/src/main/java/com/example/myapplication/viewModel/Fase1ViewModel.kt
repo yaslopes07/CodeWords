@@ -1,7 +1,10 @@
-package com.example.cacapalavras.viewModel
+package com.example.myapplication.viewModel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.local.dao.ProgressoFaseDao
+import com.example.myapplication.data.local.entity.ProgressoFaseEntity
 import com.example.myapplication.ui.state.Fase1UiState
 import com.example.myapplication.ui.state.PalavraFase
 import com.example.myapplication.ui.state.Posicao
@@ -13,7 +16,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class Fase1ViewModel : ViewModel() {
+class Fase1ViewModel(
+    private val usuarioId: Int,
+    private val progressoDao: ProgressoFaseDao
+) : ViewModel() {
+
     private val _uiState = MutableStateFlow(Fase1UiState())
     val uiState: StateFlow<Fase1UiState> = _uiState.asStateFlow()
     private var cronometroJob: Job? = null
@@ -25,8 +32,6 @@ class Fase1ViewModel : ViewModel() {
     }
 
     private fun carregarFase1() {
-
-        // Matriz 12 linhas x 8 colunas ou 11 linhas x 7 colunas
         val matriz = listOf(
             listOf('C', 'O', 'L', 'U', 'M', 'N', 'F', 'I'),
             listOf('U', 'O', 'M', 'O', 'B', 'I', 'N', 'H'),
@@ -43,7 +48,6 @@ class Fase1ViewModel : ViewModel() {
         )
 
         val listaPalavras = listOf(
-            // Vertical Principal Normal (|) - Cima -> Baixo
             PalavraFase("HELLOWORLD", posicoes = listOf(
                 Posicao(1, 7), Posicao(2, 7),
                 Posicao(3, 7), Posicao(4, 7),
@@ -52,22 +56,19 @@ class Fase1ViewModel : ViewModel() {
                 Posicao(9, 7), Posicao(10, 7)
             )),
 
-            // Horizontal Principal Normal (—) - Esquerda -> Direita
             PalavraFase("OVERRIDE", posicoes = listOf(
                 Posicao(11, 0), Posicao(11, 1),
                 Posicao(11, 2), Posicao(11, 3),
                 Posicao(11, 4), Posicao(11, 5),
-                Posicao(11, 6), Posicao(11, 7),
+                Posicao(11, 6), Posicao(11, 7)
             )),
 
-            // Horizontal Inversa (—) - (Direita -> Esquera)
             PalavraFase("IMPORT", posicoes = listOf(
-                Posicao(6, 6), Posicao(5, 6),
-                Posicao(4, 6), Posicao(3, 6),
-                Posicao(2, 6), Posicao(1, 6)
+                Posicao(4, 6), Posicao(4, 5),
+                Posicao(4, 4), Posicao(4, 3),
+                Posicao(4, 2), Posicao(4, 1)
             )),
 
-            // Vertical Normal (Cima -> Baixo)
             PalavraFase("PACKAGE", posicoes = listOf(
                 Posicao(4, 4), Posicao(5, 4),
                 Posicao(6, 4), Posicao(7, 4),
@@ -75,20 +76,17 @@ class Fase1ViewModel : ViewModel() {
                 Posicao(10, 4)
             )),
 
-            // Diagonal Inversa (Esquerda/Cima -> Direita/Baixo)
             PalavraFase("INIT", posicoes = listOf(
                 Posicao(0, 7), Posicao(1, 6),
                 Posicao(2, 5), Posicao(3, 4)
             )),
 
-            // Diagonal Inversa (Baixo -> Cima)
             PalavraFase("SPACER", posicoes = listOf(
                 Posicao(3, 5), Posicao(4, 4),
                 Posicao(5, 3), Posicao(6, 2),
-                Posicao(7,1), Posicao(8,0)
+                Posicao(7, 1), Posicao(8, 0)
             )),
 
-            // Horizontal Ao Contrário (Direita -> Esquerda)
             PalavraFase("COLUMN", posicoes = listOf(
                 Posicao(0, 0), Posicao(0, 1),
                 Posicao(0, 2), Posicao(0, 3),
@@ -151,6 +149,7 @@ class Fase1ViewModel : ViewModel() {
                     val vitoria = novasPalavras.all { it.encontrada }
                     if (vitoria) {
                         cronometroJob?.cancel()
+                        salvarProgressoNoBanco()
                     }
 
                     _uiState.update {
@@ -167,13 +166,32 @@ class Fase1ViewModel : ViewModel() {
         }
     }
 
-    fun reiniciarFase(){
-        segundosDecorridos = 0
+    private fun salvarProgressoNoBanco() {
+        if (usuarioId <= 0) return
 
+        val minutos = segundosDecorridos / 60
+        val segs = segundosDecorridos % 60
+        val tempoFormatado = "%02d:%02d".format(minutos, segs)
+
+        viewModelScope.launch {
+            progressoDao.salvarProgresso(
+                ProgressoFaseEntity(
+                    usuarioId = usuarioId,
+                    numeroFase = 1,
+                    tempoSegundos = segundosDecorridos,
+                    tempoFormatado = tempoFormatado
+                )
+            )
+        }
+    }
+
+    fun reiniciarFase() {
+        segundosDecorridos = 0
         carregarFase1()
 
         _uiState.update {
             it.copy(
+                tempoDecorrido = "00:00",
                 posicoesSelecionada = emptyList(),
                 posicoesEncontradas = emptySet(),
                 mensagemVitoria = false
@@ -186,5 +204,17 @@ class Fase1ViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         cronometroJob?.cancel()
+    }
+
+    companion object {
+        fun provideFactory(
+            usuarioId: Int,
+            progressoDao: ProgressoFaseDao
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return Fase1ViewModel(usuarioId, progressoDao) as T
+            }
+        }
     }
 }

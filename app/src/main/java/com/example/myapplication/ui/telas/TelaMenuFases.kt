@@ -119,11 +119,11 @@ fun TelaMenuFases(
             CardFase(
                 titulo = "Fase 1",
                 subtitulo = "Primeiros Passos",
-                desbloqueada = false,
-                concluida = false,
+                desbloqueada = true,
+                concluida = fasesConcluidas.contains(1),
                 corCardBloqueado = corCardBloqueado,
                 corVerde = corVerde,
-                onClick = {}
+                onClick = { onFaseClick(1) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))

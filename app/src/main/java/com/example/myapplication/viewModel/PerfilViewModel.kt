@@ -29,7 +29,6 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
             val recordes = progressoDao.buscarRankingPessoalDoUsuario(usuario.id)
             val mapaRecordes = recordes.associateBy { it.numeroFase }
 
-            // Melhor tempo geral entre todas as fases concluídas
             val menorTempoSegundos = recordes.minOfOrNull { it.menorTempoSegundos }
             val melhorTempoTexto = if (menorTempoSegundos != null) {
                 formatarTempo(menorTempoSegundos)
@@ -37,22 +36,15 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
                 "--:--"
             }
 
-            // Monta os 4 itens da lista
             val fasesAtualizadas = listOf(
-                FasePerfilItem(
-                    numero = 1,
-                    titulo = "Fase 1",
-                    subtitulo = "Primeiros Passos",
-                    tempoTexto = "Em breve",
-                    concluida = false
-                ),
+                criarItemFase(1, "Fase 1", "Primeiros Passos", mapaRecordes[1]?.menorTempoSegundos),
                 criarItemFase(2, "Fase 2", "Conexões", mapaRecordes[2]?.menorTempoSegundos),
                 criarItemFase(3, "Fase 3", "Precisão", mapaRecordes[3]?.menorTempoSegundos),
                 criarItemFase(4, "Fase 4", "Desafio", mapaRecordes[4]?.menorTempoSegundos)
             )
 
-            val totalJogaveis = 3 // Fases 2, 3 e 4
-            val qtdConcluidas = recordes.count { it.numeroFase in 2..4 }
+            val totalJogaveis = 4
+            val qtdConcluidas = recordes.count { it.numeroFase in 1..4 }
             val progresso = (qtdConcluidas.toFloat() / totalJogaveis.toFloat()).coerceIn(0f, 1f)
 
             _uiState.update {
@@ -99,4 +91,3 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
         return "%02d:%02d".format(minutos, segs)
     }
 }
-

@@ -30,6 +30,7 @@ import com.example.myapplication.ui.telas.TelaPerfilRoute
 import com.example.myapplication.ui.telas.TelaRankingRoute
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.viewModel.LoginViewModel
+import com.example.myapplication.ui.telas.TelaFase1Route
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +50,6 @@ class MainActivity : ComponentActivity() {
                 var usuarioLogado by remember { mutableStateOf<UsuarioEntity?>(null) }
                 var fasesConcluidas by remember { mutableStateOf<Set<Int>>(emptySet()) }
 
-                // 1. Verifica ao abrir o app se já existe um usuário salvo
                 LaunchedEffect(Unit) {
                     val idSalvo = prefs.getInt("usuario_id", 0)
                     if (idSalvo != 0) {
@@ -64,7 +64,6 @@ class MainActivity : ComponentActivity() {
                     verificandoSessao = false
                 }
 
-                // 2. Carrega as fases concluídas sempre que entrar no menu
                 LaunchedEffect(telaAtual, usuarioLogado) {
                     val userId = usuarioLogado?.id ?: return@LaunchedEffect
                     if (telaAtual == "menu_fases") {
@@ -73,7 +72,6 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (verificandoSessao) {
-                    // Fundo escuro enquanto checa a sessão salva
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -122,6 +120,11 @@ class MainActivity : ComponentActivity() {
                             },
                             onNavegarFases = { telaAtual = "menu_fases" },
                             onNavegarRanking = { telaAtual = "ranking" }
+                        )
+
+                        "fase1" -> TelaFase1Route(
+                            usuarioId = usuarioLogado?.id ?: 0,
+                            onVoltarClick = { telaAtual = "menu_fases" }
                         )
 
                         "fase2" -> TelaFase2Route(

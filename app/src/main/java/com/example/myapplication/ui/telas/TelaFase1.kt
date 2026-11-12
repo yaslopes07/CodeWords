@@ -14,11 +14,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -39,38 +40,42 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.cacapalavras.viewModel.Fase1ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.data.local.AppDatabase
 import com.example.myapplication.ui.state.Fase1UiState
 import com.example.myapplication.ui.state.Posicao
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.viewModel.Fase1ViewModel
 
 @Composable
 fun TelaFase1Route(
-
-    viewModel: Fase1ViewModel = viewModel(),
-
+    usuarioId: Int,
     onVoltarClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val progressoDao = remember { AppDatabase.getDatabase(context).progressoFaseDao() }
+    val viewModel: Fase1ViewModel = viewModel(
+        factory = Fase1ViewModel.provideFactory(usuarioId, progressoDao)
+    )
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     TelaFase1(
         uiState = uiState,
         onVoltarClick = onVoltarClick,
-        onLetraClick = {posicao -> viewModel.selecionarPosicao(posicao)},
-        onRecomecarClick = {viewModel.reiniciarFase()}
-
+        onLetraClick = { posicao -> viewModel.selecionarPosicao(posicao) },
+        onRecomecarClick = { viewModel.reiniciarFase() }
     )
 }
 
@@ -80,22 +85,19 @@ fun TelaFase1(
     onVoltarClick: () -> Unit = {},
     onLetraClick: (Posicao) -> Unit = {},
     onRecomecarClick: () -> Unit = {}
-){
-
+) {
     val corFundo = Color(0xFF141E26)
-
     val corCardGrid = Color(0xFFEBF3FB)
-
     val corDoProgresso = Color(0xFF00E676)
-
     val corVerdeDestaque = Color(0xFFA5D6A7)
-
     val corAzulChip = Color(0xFFD6E8FA)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(corFundo)
+            .statusBarsPadding()
+            .navigationBarsPadding()
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -190,11 +192,10 @@ fun TelaFase1(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-
                 val totalLinhas = uiState.matrizLetras.size
                 val totalColunas = if (totalLinhas > 0) uiState.matrizLetras[0].size else 0
 
-                itemsIndexed(uiState.matrizLetras.flatten()){ index, letra ->
+                itemsIndexed(uiState.matrizLetras.flatten()) { index, letra ->
                     val l = index / totalColunas
                     val c = index % totalColunas
                     val posicao = Posicao(l, c)
@@ -208,13 +209,13 @@ fun TelaFase1(
                             .padding(2.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(
-                                when{
+                                when {
                                     estaEncontrada -> corVerdeDestaque
                                     estaSelecionada -> Color(0xFF81C784)
                                     else -> Color.Transparent
                                 }
                             )
-                            .clickable{onLetraClick(posicao)},
+                            .clickable { onLetraClick(posicao) },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -254,7 +255,7 @@ fun TelaFase1(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(horizontal = 4.dp)
                 ) {
-                    items(uiState.palavras){item ->
+                    items(uiState.palavras) { item ->
                         Surface(
                             color = corAzulChip,
                             shape = CircleShape
@@ -272,9 +273,10 @@ fun TelaFase1(
                 }
             }
         }
+
         if (uiState.mensagemVitoria) {
             AlertDialog(
-                onDismissRequest = { /* Mantém aberto até clicar num botão */ },
+                onDismissRequest = { },
                 containerColor = Color(0xFF1F2C34),
                 title = {
                     Text(
@@ -326,4 +328,3 @@ fun TelaFase1(
         }
     }
 }
-
