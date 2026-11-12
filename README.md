@@ -110,7 +110,7 @@ Entre os dados armazenados estão:
 
 ## 👥 Equipe de Desenvolvimento
 
-- **[Ana Júlia Nicolack](https://github.com/anajulianicolack)**
+- **[Ana Júlia Nicolack](https://github.com/anajulianicolack-hub)**
 - **[Eduardo Fogaça Bader](https://github.com/pardalzincwb)**
 - **[Pedro Henrique Alves](https://github.com/alvespedroo)**
 - **[Vitor Matheus Gauer](https://github.com/Vitor-Gauer)**
