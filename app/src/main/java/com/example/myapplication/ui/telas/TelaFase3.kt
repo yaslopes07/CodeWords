@@ -204,7 +204,7 @@ fun TelaFase3(
                             .background(
                                 when {
                                     estaEncontrada -> corVerdeDestaque
-                                    estaSelecionada -> Color(0xFF81C784)
+                                    estaSelecionada -> Color(0xFF93C5FD)
                                     else -> Color.Transparent
                                 }
                             )

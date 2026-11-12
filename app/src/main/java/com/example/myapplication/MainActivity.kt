@@ -18,6 +18,7 @@ import com.example.myapplication.ui.telas.TelaFase3Route
 import com.example.myapplication.ui.telas.TelaFase4Route
 import com.example.myapplication.ui.telas.TelaLoginRoute
 import com.example.myapplication.ui.telas.TelaMenuFases
+import com.example.myapplication.ui.telas.TelaRankingRoute
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +34,6 @@ class MainActivity : ComponentActivity() {
                 var usuarioLogado by remember { mutableStateOf<UsuarioEntity?>(null) }
                 var fasesConcluidas by remember { mutableStateOf<Set<Int>>(emptySet()) }
 
-                // Atualiza a lista de fases concluídas sempre que voltar para o menu
                 LaunchedEffect(telaAtual, usuarioLogado) {
                     val userId = usuarioLogado?.id ?: return@LaunchedEffect
                     if (telaAtual == "menu_fases") {
@@ -57,16 +57,28 @@ class MainActivity : ComponentActivity() {
                         fasesConcluidas = fasesConcluidas,
                         onFaseClick = { numeroFase ->
                             telaAtual = "fase$numeroFase"
-                        }
+                        },
+                        onRankingClick = { telaAtual = "ranking" },
+                        onPerfilClick = { telaAtual = "perfil" }
                     )
+                    "ranking" -> TelaRankingRoute(
+                        usuarioId = usuarioLogado?.id ?: 0,
+                        onFasesClick = { telaAtual = "menu_fases" },
+                        onPerfilClick = { telaAtual = "perfil" }
+                    )
+                    "perfil" -> {
+                        // Aqui vamos conectar a TelaPerfilRoute assim que você mandar o código dela!
+                    }
                     "fase2" -> TelaFase2Route(
                         usuarioId = usuarioLogado?.id ?: 0,
                         onVoltarClick = { telaAtual = "menu_fases" }
                     )
                     "fase3" -> TelaFase3Route(
+                        usuarioId = usuarioLogado?.id ?: 0,
                         onVoltarClick = { telaAtual = "menu_fases" }
                     )
                     "fase4" -> TelaFase4Route(
+                        usuarioId = usuarioLogado?.id ?: 0,
                         onVoltarClick = { telaAtual = "menu_fases" }
                     )
                 }

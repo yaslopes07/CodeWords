@@ -5,6 +5,11 @@ import androidx.room3.Insert
 import androidx.room3.Query
 import com.example.myapplication.data.local.entity.ProgressoFaseEntity
 
+data class MelhorTempoFase(
+    val numeroFase: Int,
+    val menorTempoSegundos: Int
+)
+
 @Dao
 interface ProgressoFaseDao {
 
@@ -16,5 +21,8 @@ interface ProgressoFaseDao {
 
     @Query("SELECT * FROM progresso_fases WHERE usuarioId = :usuarioId AND numeroFase = :numeroFase ORDER BY tempoSegundos ASC LIMIT 1")
     suspend fun buscarMelhorTempo(usuarioId: Int, numeroFase: Int): ProgressoFaseEntity?
+
+    @Query("SELECT numeroFase, MIN(tempoSegundos) AS menorTempoSegundos FROM progresso_fases WHERE usuarioId = :usuarioId GROUP BY numeroFase ORDER BY menorTempoSegundos ASC")
+    suspend fun buscarRankingPessoalDoUsuario(usuarioId: Int): List<MelhorTempoFase>
 }
 
