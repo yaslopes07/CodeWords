@@ -20,10 +20,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,16 +32,44 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
+import com.example.myapplication.data.local.entity.UsuarioEntity
+import com.example.myapplication.ui.state.LoginUiState
+import com.example.myapplication.viewModel.LoginViewModel
+
+@Composable
+fun TelaLoginRoute(
+    viewModel: LoginViewModel = viewModel(),
+    onLoginSucesso: (UsuarioEntity) -> Unit = {},
+    onCadastrarClick: () -> Unit = {}
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.usuarioLogado) {
+        uiState.usuarioLogado?.let { usuario ->
+            onLoginSucesso(usuario)
+        }
+    }
+
+    TelaLogin(
+        uiState = uiState,
+        onEmailOuUsuarioChange = viewModel::onEmailOuUsuarioChange,
+        onSenhaChange = viewModel::onSenhaChange,
+        onEntrarClick = viewModel::entrar,
+        onCadastrarClick = onCadastrarClick
+    )
+}
 
 @Composable
 fun TelaLogin(
+    uiState: LoginUiState,
+    onEmailOuUsuarioChange: (String) -> Unit = {},
+    onSenhaChange: (String) -> Unit = {},
     onEntrarClick: () -> Unit = {},
     onCadastrarClick: () -> Unit = {}
 ) {
-    var emailOuUsuario by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
-
     val corFundo = Color(0xFFFFFFFF)
     val corVerde = Color(0xFF16D174)
     val corTextoEscuro = Color(0xFF1E293B)
@@ -74,8 +100,8 @@ fun TelaLogin(
             Spacer(modifier = Modifier.height(10.dp))
 
             OutlinedTextField(
-                value = emailOuUsuario,
-                onValueChange = { emailOuUsuario = it },
+                value = uiState.emailOuUsuario,
+                onValueChange = onEmailOuUsuarioChange,
                 placeholder = { Text("Email ou Usuário", color = Color(0xFF475569), fontSize = 14.sp) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -92,10 +118,9 @@ fun TelaLogin(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Campo: Senha
             OutlinedTextField(
-                value = senha,
-                onValueChange = { senha = it },
+                value = uiState.senha,
+                onValueChange = onSenhaChange,
                 placeholder = { Text("Senha", color = Color(0xFF475569), fontSize = 14.sp) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -112,9 +137,18 @@ fun TelaLogin(
                 singleLine = true
             )
 
+            if (uiState.mensagemErro != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = uiState.mensagemErro,
+                    color = Color(0xFFDC2626),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
             Spacer(modifier = Modifier.height(28.dp))
 
-            // Botão Entrar
             Button(
                 onClick = onEntrarClick,
                 modifier = Modifier
@@ -168,5 +202,5 @@ fun TelaLogin(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun TelaLoginPreview() {
-    TelaLogin()
+    TelaLogin(uiState = LoginUiState())
 }
