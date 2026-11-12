@@ -32,6 +32,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(senha = novaSenha, mensagemErro = null) }
     }
 
+    fun resetarLogin() {
+        _uiState.value = LoginUiState()
+    }
+
     fun entrar() {
         val estado = _uiState.value
         if (estado.emailOuUsuario.isBlank() || estado.senha.isBlank()) {

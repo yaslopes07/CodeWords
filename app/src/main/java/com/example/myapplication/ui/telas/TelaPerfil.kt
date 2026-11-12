@@ -35,6 +35,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,10 +46,37 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.data.local.entity.UsuarioEntity
+import com.example.myapplication.ui.state.PerfilUiState
+import com.example.myapplication.viewModel.PerfilViewModel
+
+@Composable
+fun TelaPerfilRoute(
+    usuarioLogado: UsuarioEntity?,
+    viewModel: PerfilViewModel = viewModel(),
+    onSairClick: () -> Unit = {},
+    onNavegarFases: () -> Unit = {},
+    onNavegarRanking: () -> Unit = {}
+) {
+    LaunchedEffect(usuarioLogado) {
+        viewModel.carregarPerfil(usuarioLogado)
+    }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    TelaPerfil(
+        uiState = uiState,
+        onSairClick = onSairClick,
+        onNavegarFases = onNavegarFases,
+        onNavegarRanking = onNavegarRanking
+    )
+}
 
 @Composable
 fun TelaPerfil(
-    onVoltarClick: () -> Unit = {},
+    uiState: PerfilUiState = PerfilUiState(),
     onSairClick: () -> Unit = {},
     onNavegarFases: () -> Unit = {},
     onNavegarRanking: () -> Unit = {}
@@ -83,25 +112,15 @@ fun TelaPerfil(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Spacer(modifier = Modifier.size(24.dp))
-
                     Text(
                         text = "Perfil do Jogador",
                         color = Color.White,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
-
-                    IconButton(onClick = { /* Editar Perfil */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Editar Perfil",
-                            tint = Color.White
-                        )
-                    }
                 }
             }
 
@@ -131,7 +150,7 @@ fun TelaPerfil(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "PedroPlay",
+                    text = uiState.nomeUsuario,
                     color = Color.White,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
@@ -167,14 +186,14 @@ fun TelaPerfil(
                     .padding(horizontal = 20.dp)
             ) {
                 Text(
-                    text = "Nível 3",
+                    text = "Nível ${uiState.nivel}",
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 LinearProgressIndicator(
-                    progress = { 0.6f },
+                    progress = { uiState.progressoNivel },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(10.dp)
@@ -229,7 +248,7 @@ fun TelaPerfil(
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = "00:51",
+                                text = uiState.melhorTempoGeral,
                                 color = corTextoEscuro,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
@@ -261,7 +280,7 @@ fun TelaPerfil(
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = "3/4",
+                                text = uiState.fasesConcluidasTexto,
                                 color = corTextoEscuro,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
@@ -288,34 +307,15 @@ fun TelaPerfil(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                ItemProgressoFase(
-                    fase = "Fase 1",
-                    nome = "Primeiros Passos",
-                    tempo = "00:42",
-                    concluida = true,
-                    corVerde = corVerde
-                )
-                ItemProgressoFase(
-                    fase = "Fase 2",
-                    nome = "Conexões",
-                    tempo = "01:15",
-                    concluida = true,
-                    corVerde = corVerde
-                )
-                ItemProgressoFase(
-                    fase = "Fase 3",
-                    nome = "Precisão",
-                    tempo = "02:08",
-                    concluida = true,
-                    corVerde = corVerde
-                )
-                ItemProgressoFase(
-                    fase = "Fase 4",
-                    nome = "Desafio",
-                    tempo = "Não Concluída",
-                    concluida = false,
-                    corVerde = corVerde
-                )
+                uiState.listaFases.forEach { item ->
+                    ItemProgressoFase(
+                        fase = item.titulo,
+                        nome = item.subtitulo,
+                        tempo = item.tempoTexto,
+                        concluida = item.concluida,
+                        corVerde = corVerde
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(28.dp))

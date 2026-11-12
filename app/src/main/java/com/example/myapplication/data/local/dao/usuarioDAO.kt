@@ -17,4 +17,7 @@ interface usuarioDAO {
 
     @Query("SELECT * FROM usuarios WHERE emailUsuario = :login LIMIT 1")
     suspend fun buscarPorLogin(login: String): UsuarioEntity?
+
+    @Query("SELECT * FROM usuarios WHERE id = :id LIMIT 1")
+    suspend fun buscarPorId(id: Int): UsuarioEntity?
 }
