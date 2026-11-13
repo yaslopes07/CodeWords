@@ -1,120 +1,120 @@
+
 # 🔤 CodeWords
 
-O **CodeWords** é um jogo de caça-palavras desenvolvido para dispositivos Android, no qual os jogadores devem encontrar palavras escondidas em 
-matrizes de letras. Com diferentes fases e desafios, o aplicativo proporciona uma experiência divertida, estimulando a concentração, a percepção
-visual e o raciocínio.
+**CodeWords** é um jogo de caça-palavras para Android com temática de tecnologia e programação. O jogador procura palavras escondidas em matrizes de letras, conclui fases e acompanha seu desempenho por meio de tempos e recordes.
+
+> Projeto acadêmico desenvolvido para a disciplina de **Desenvolvimento de Aplicativos Móveis (Android)**.
 
 ---
 
-## 📌 Sobre o Projeto
+## 🎥 Demonstração
 
-Este projeto foi desenvolvido como parte de uma atividade acadêmica para a matéria de **Desenvolvimento de Aplicativos Móveis (Android)**.
+Assista à demonstração do aplicativo:
 
-O objetivo principal é criar um jogo de caça-palavras interativo, no qual os usuários possam testar suas habilidades de observação e encontrar 
-palavras relacionadas ao universo da tecnologia e programação.
-
-## 🛠️ Tecnologias e Arquitetura
-
-O projeto foi desenvolvido utilizando ferramentas e recursos do ecossistema moderno de desenvolvimento Android:
-
-- **Linguagem de Programação:** Kotlin.
-- **Interface Gráfica:** Jetpack Compose e Material 3.
-- **Arquitetura:** organização baseada em ViewModel.
-- **Gerenciamento de Estado:** Kotlin Coroutines e StateFlow.
-- **Persistência Local:** Room Database (SQLite).
-- **Processamento de Código:** KSP (Kotlin Symbol Processing).
-- **Build:** Gradle com Kotlin DSL.
+[▶️ **Abrir vídeo de demonstração**](https://drive.google.com/file/d/1iBJGm_dWZC59Mfr6mbkKnhn1B0Z_d77x/view?usp=sharing)
 
 ---
 
-## ✨ Principais Funcionalidades
+## ✨ Funcionalidades
 
-- 🔐 **Cadastro e Login:** criação de contas e acesso ao aplicativo.
-- 🔤 **Jogo de Caça-Palavras:** encontre palavras escondidas em uma matriz de letras.
-- 🎮 **Fases e Desafios:** avance por quatro fases diferentes do jogo.
-- ⏱️ **Cronômetro:** acompanhe o tempo gasto para concluir cada fase.
-- 🏆 **Registro de Desempenho:** acompanhe os tempos e resultados das partidas.
-- 👤 **Perfil do Jogador:** consulte suas informações e seu progresso.
-- 📊 **Melhores Tempos:** visualize seus melhores resultados em cada fase.
-- 💾 **Salvamento Local:** mantenha os dados dos usuários e resultados armazenados no dispositivo.
+- 🔐 **Cadastro e login:** criação de conta e autenticação local.
+- 🔤 **Caça-palavras:** seleção de palavras escondidas em matrizes de letras.
+- 🎮 **Quatro fases:** desafios com palavras relacionadas à tecnologia e programação.
+- ⏱️ **Cronômetro:** medição do tempo de conclusão das fases.
+- 🏆 **Recordes e ranking:** consulta aos melhores tempos registrados pelo jogador.
+- 👤 **Perfil:** visualização de informações e progresso nas fases.
+- 🛠️ **Painel administrativo:** área para gerenciamento dos usuários.
+- 💾 **Persistência local:** armazenamento de usuários e progresso no banco de dados do dispositivo.
 
-### 🧩 Fases do Jogo
-
-O CodeWords possui quatro fases:
+### 🧩 Fases
 
 | Fase | Nome |
-|---|---|
+|:---:|---|
 | 1 | Primeiros Passos |
 | 2 | Conexões |
 | 3 | Precisão |
 | 4 | Desafio |
 
-Cada fase apresenta um conjunto de palavras que devem ser encontradas pelo jogador na matriz de letras.
+---
+
+## 🛠️ Tecnologias
+
+- **Kotlin** — linguagem principal.
+- **Jetpack Compose** — construção das interfaces.
+- **Material 3** — componentes visuais.
+- **ViewModel** — organização da lógica de apresentação.
+- **Kotlin Coroutines e StateFlow** — operações assíncronas e gerenciamento de estado.
+- **Room (SQLite)** — persistência de dados local.
+- **KSP (Kotlin Symbol Processing)** — processamento de anotações do Room.
+- **Coil** — carregamento de imagens.
+- **Gradle Kotlin DSL** — configuração e build do projeto.
 
 ---
 
-## 💻 Como Executar o Projeto
+## 🏗️ Organização do projeto
+
+O código-fonte está organizado principalmente em:
+
+```text
+CodeWords/
+├── app/
+│   └── src/
+│       └── main/
+│           ├── java/com/example/myapplication/
+│           │   ├── data/
+│           │   │   ├── local/          # Banco Room, entidades e DAOs
+│           │   │   └── repository/     # Repositórios
+│           │   ├── ui/
+│           │   │   ├── state/         # Estados das telas
+│           │   │   ├── telas/         # Interfaces do aplicativo
+│           │   │   └── theme/         # Tema visual
+│           │   ├── viewModel/         # Lógica e estado das telas
+│           │   └── MainActivity.kt
+│           └── res/                   # Recursos visuais
+├── docs/
+│   └── demo.mp4                       # Vídeo de demonstração
+└── README.md
+```
+
+---
+
+## 💻 Como executar
 
 ### Pré-requisitos
 
-- Android Studio instalado.
-- JDK 11 ou versão compatível com o Gradle.
+- Android Studio.
 - Android SDK configurado.
-- Emulador Android ou dispositivo físico disponível.
-- Conexão com a internet para sincronização das dependências.
+- JDK compatível com a versão do Android Gradle Plugin utilizada pelo projeto.
+- Emulador Android ou dispositivo físico com depuração USB habilitada.
 
-### Passo a Passo
+### Passos
 
-**1. Abra o Android Studio**
+1. **Clone o repositório:**
 
-Com o Android Studio aberto, acesse:
+   ```bash
+   git clone https://github.com/yaslopes07/CodeWords.git
+   ```
 
-`File → New → Project from Version Control...`
+2. **Abra o projeto** no Android Studio.
 
-**2. Clone o repositório**
+3. **Aguarde a sincronização** do Gradle e o download das dependências.
 
-Na janela **Clone Repository**, selecione **Git** em *Version control*.
-
-No campo **URL**, cole o endereço do repositório:
-
-```text
-https://github.com/yaslopes07/CodeWords.git
-```
-
-Selecione a pasta onde o projeto será salvo e clique em **Clone**.
-
-**3. Sincronize o projeto**
-
-Aguarde o Android Studio carregar os arquivos e sincronizar as dependências do Gradle.
-
-**4. Execute o aplicativo**
-
-Selecione um emulador Android ou conecte um dispositivo físico com a depuração USB ativada.
-
-Clique no botão **Run ▶** (Shift + F10) para compilar e iniciar o CodeWords.
-
-## 💾 Armazenamento de Dados
-
-O aplicativo utiliza o **Room Database**, baseado em SQLite, para armazenar informações localmente no dispositivo.
-
-Entre os dados armazenados estão:
-
-- Informações dos usuários cadastrados.
-- Progresso e conclusão das fases.
-- Tempos registrados durante as partidas.
-- Melhores resultados de cada jogador.
-
-> [!WARNING]
-> **Observação:** O projeto possui finalidade acadêmica e demonstrativa. A autenticação e o armazenamento são realizados localmente.
-
+4. **Execute o aplicativo:** selecione um emulador ou dispositivo Android e clique em **Run ▶**.
 
 ---
 
-## 👥 Equipe de Desenvolvimento
+## 💾 Armazenamento e observações
 
-- **[Ana Júlia Nicolack](https://github.com/anajulianicolack-hub)**
-- **[Eduardo Fogaça Bader](https://github.com/pardalzincwb)**
-- **[Pedro Henrique Alves](https://github.com/alvespedroo)**
-- **[Vitor Matheus Gauer](https://github.com/Vitor-Gauer)**
-- **[Yasmin da Rocha Lopes](https://github.com/yaslopes07)**
+O CodeWords utiliza banco de dados local com Room, baseado em SQLite. Os dados de cadastro e o progresso são mantidos no próprio dispositivo.
 
+> **Importante:** a autenticação e a persistência são locais. O projeto tem finalidade acadêmica e demonstrativa; não representa um serviço de autenticação ou sincronização em nuvem.
+
+---
+
+## 👥 Equipe de desenvolvimento
+
+- [Ana Júlia Nicolack](https://github.com/anajulianicolack-hub)
+- [Eduardo Fogaça Bader](https://github.com/pardalzincwb)
+- [Pedro Henrique Alves](https://github.com/alvespedroo)
+- [Vitor Matheus Gauer](https://github.com/Vitor-Gauer)
+- [Yasmin da Rocha Lopes](https://github.com/yaslopes07)
