@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.myapplication.data.local.entity.UsuarioEntity
 import com.example.myapplication.ui.state.PerfilUiState
 import com.example.myapplication.viewModel.PerfilViewModel
@@ -131,12 +133,21 @@ fun TelaPerfil(
                     .background(Color(0xFFCBD5E1)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Foto de Perfil",
-                    tint = Color.White,
-                    modifier = Modifier.size(70.dp)
-                )
+                if (!uiState.fotoUri.isNullOrBlank()) {
+                    AsyncImage(
+                        model = uiState.fotoUri,
+                        contentDescription = "Foto de Perfil",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Foto de Perfil",
+                        tint = Color.White,
+                        modifier = Modifier.size(70.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))

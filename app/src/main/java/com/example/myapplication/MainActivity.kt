@@ -21,16 +21,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.local.AppDatabase
 import com.example.myapplication.data.local.entity.UsuarioEntity
 import com.example.myapplication.ui.telas.TelaCadastroRoute
+import com.example.myapplication.ui.telas.TelaFase1Route
 import com.example.myapplication.ui.telas.TelaFase2Route
 import com.example.myapplication.ui.telas.TelaFase3Route
 import com.example.myapplication.ui.telas.TelaFase4Route
 import com.example.myapplication.ui.telas.TelaLoginRoute
 import com.example.myapplication.ui.telas.TelaMenuFases
+import com.example.myapplication.ui.telas.TelaPainelAdminRoute
 import com.example.myapplication.ui.telas.TelaPerfilRoute
 import com.example.myapplication.ui.telas.TelaRankingRoute
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.viewModel.LoginViewModel
-import com.example.myapplication.ui.telas.TelaFase1Route
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +57,11 @@ class MainActivity : ComponentActivity() {
                         val usuarioEncontrado = usuarioDao.buscarPorId(idSalvo)
                         if (usuarioEncontrado != null) {
                             usuarioLogado = usuarioEncontrado
-                            telaAtual = "menu_fases"
+                            telaAtual = if (usuarioEncontrado.papel.equals("ADMIN", ignoreCase = true)) {
+                                "admin"
+                            } else {
+                                "menu_fases"
+                            }
                         } else {
                             prefs.edit { remove("usuario_id") }
                         }
@@ -84,9 +89,24 @@ class MainActivity : ComponentActivity() {
                             onLoginSucesso = { usuario ->
                                 prefs.edit { putInt("usuario_id", usuario.id) }
                                 usuarioLogado = usuario
-                                telaAtual = "menu_fases"
+                                telaAtual = if (usuario.papel.equals("ADMIN", ignoreCase = true)) {
+                                    "admin"
+                                } else {
+                                    "menu_fases"
+                                }
                             },
                             onCadastrarClick = { telaAtual = "cadastro" }
+                        )
+
+                        "admin" -> TelaPainelAdminRoute(
+                            nomeAdminLogado = usuarioLogado?.nome?.ifBlank { usuarioLogado?.emailUsuario } ?: "Administrador",
+                            onLogoutClick = {
+                                prefs.edit { remove("usuario_id") }
+                                loginViewModel.resetarLogin()
+                                usuarioLogado = null
+                                fasesConcluidas = emptySet()
+                                telaAtual = "login"
+                            }
                         )
 
                         "cadastro" -> TelaCadastroRoute(

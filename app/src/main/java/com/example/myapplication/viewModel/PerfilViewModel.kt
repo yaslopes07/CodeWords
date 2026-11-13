@@ -50,6 +50,7 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
             _uiState.update {
                 it.copy(
                     nomeUsuario = nomeExibicao,
+                    fotoUri = usuario.fotoUri,
                     nivel = 1 + qtdConcluidas,
                     progressoNivel = progresso,
                     melhorTempoGeral = melhorTempoTexto,

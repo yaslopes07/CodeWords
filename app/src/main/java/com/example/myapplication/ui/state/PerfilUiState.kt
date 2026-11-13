@@ -10,6 +10,7 @@ data class FasePerfilItem(
 
 data class PerfilUiState(
     val nomeUsuario: String = "Jogador",
+    val fotoUri: String? = null,
     val nivel: Int = 1,
     val progressoNivel: Float = 0f,
     val melhorTempoGeral: String = "--:--",

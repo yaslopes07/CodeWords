@@ -71,4 +71,7 @@ dependencies {
 // Coleta seguro de StateFlow no ciclo de vida do Compose
 // (necessário para o collectAsStateWithLifecycle)
     implementation("androidx.lifecycle:lifecycle-runtime-compose:${lifecycle_version}")
+
+    // Coil para carregamento de imagens no Jetpack Compose
+    implementation("io.coil-kt:coil-compose:2.7.0")
 }

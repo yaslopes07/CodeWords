@@ -11,7 +11,7 @@ import com.example.myapplication.data.local.entity.UsuarioEntity
 
 @Database(
     entities = [UsuarioEntity::class, ProgressoFaseEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
