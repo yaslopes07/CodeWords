@@ -13,6 +13,10 @@ Assista à demonstração do aplicativo:
 
 [▶️ **Abrir vídeo de demonstração**](https://drive.google.com/file/d/1iBJGm_dWZC59Mfr6mbkKnhn1B0Z_d77x/view?usp=sharing)
 
+Acesse o desenho inicial das telas: 
+
+[**Abrir desenho das telas**](https://drive.google.com/drive/folders/1EsIhhV7BFaS6aYo577g55-r7ScetdpQ3?usp=sharing)
+
 ---
 
 ## Funcionalidades
