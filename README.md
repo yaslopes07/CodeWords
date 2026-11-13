@@ -105,7 +105,7 @@ CodeWords/
 
 O CodeWords utiliza banco de dados local com Room, baseado em SQLite. Os dados de cadastro e o progresso são mantidos no próprio dispositivo.
 
-> **Importante:** a autenticação e a persistência são locais. O projeto tem finalidade acadêmica e demonstrativa; não representa um serviço de autenticação ou sincronização em nuvem.
+> [!WARNING] a autenticação e a persistência são locais. O projeto tem finalidade acadêmica e demonstrativa; não representa um serviço de autenticação ou sincronização em nuvem.
 
 ---
 
