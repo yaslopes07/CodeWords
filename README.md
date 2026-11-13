@@ -71,8 +71,6 @@ CodeWords/
 │           │   ├── viewModel/         # Lógica e estado das telas
 │           │   └── MainActivity.kt
 │           └── res/                   # Recursos visuais
-├── docs/
-│   └── demo.mp4                       # Vídeo de demonstração
 └── README.md
 ```
 
