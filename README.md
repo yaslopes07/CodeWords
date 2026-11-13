@@ -11,7 +11,7 @@
 
 Assista à demonstração do aplicativo:
 
-[▶️ **Abrir vídeo de demonstração**](https://drive.google.com/file/d/1iBJGm_dWZC59Mfr6mbkKnhn1B0Z_d77x/view?usp=sharing)
+[**Abrir vídeo de demonstração**](https://drive.google.com/file/d/1iBJGm_dWZC59Mfr6mbkKnhn1B0Z_d77x/view?usp=sharing)
 
 Acesse o desenho inicial das telas: 
 
