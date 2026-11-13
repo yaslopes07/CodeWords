@@ -15,16 +15,16 @@ Assista à demonstração do aplicativo:
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
-- 🔐 **Cadastro e login:** criação de conta e autenticação local.
-- 🔤 **Caça-palavras:** seleção de palavras escondidas em matrizes de letras.
-- 🎮 **Quatro fases:** desafios com palavras relacionadas à tecnologia e programação.
-- ⏱️ **Cronômetro:** medição do tempo de conclusão das fases.
-- 🏆 **Recordes e ranking:** consulta aos melhores tempos registrados pelo jogador.
-- 👤 **Perfil:** visualização de informações e progresso nas fases.
-- 🛠️ **Painel administrativo:** área para gerenciamento dos usuários.
-- 💾 **Persistência local:** armazenamento de usuários e progresso no banco de dados do dispositivo.
+-  **Cadastro e login:** criação de conta e autenticação local.
+-  **Caça-palavras:** seleção de palavras escondidas em matrizes de letras.
+-  **Quatro fases:** desafios com palavras relacionadas à tecnologia e programação.
+-  **Cronômetro:** medição do tempo de conclusão das fases.
+-  **Recordes e ranking:** consulta aos melhores tempos registrados pelo jogador.
+-  **Perfil:** visualização de informações e progresso nas fases.
+-  **Painel administrativo:** área para gerenciamento dos usuários.
+-  **Persistência local:** armazenamento de usuários e progresso no banco de dados do dispositivo.
 
 ### 🧩 Fases
 
@@ -51,7 +51,7 @@ Assista à demonstração do aplicativo:
 
 ---
 
-## 🏗️ Organização do projeto
+##  Organização do projeto
 
 O código-fonte está organizado principalmente em:
 
@@ -103,10 +103,10 @@ CodeWords/
 
 ## 💾 Armazenamento e observações
 
-O CodeWords utiliza banco de dados local com Room, baseado em SQLite. Os dados de cadastro e o progresso são mantidos no próprio dispositivo.
+O CodeWords utiliza o Room, baseado em SQLite, para armazenar localmente os dados dos usuários e o progresso nas fases.
 
 > [!WARNING]
-> A autenticação e a persistência são locais. O projeto tem finalidade acadêmica e demonstrativa.
+> A autenticação e a persistência dos dados são realizadas localmente no dispositivo. O projeto possui finalidade acadêmica e demonstrativa, não oferecendo serviços de autenticação ou sincronização em nuvem.
 
 ---
 
