@@ -8,10 +8,10 @@ visual e o raciocínio.
 
 ## 📌 Sobre o Projeto
 
-Este projeto foi desenvolvido como parte de uma atividade acadêmica voltada ao desenvolvimento de aplicativos móveis para Android.
+Este projeto foi desenvolvido como parte de uma atividade acadêmica para a matéria de **Desenvolvimento de Aplicativos Móveis (Android)**.
 
 O objetivo principal é criar um jogo de caça-palavras interativo, no qual os usuários possam testar suas habilidades de observação e encontrar 
-palavras relacionadas a diferentes conceitos, especialmente do universo da programação e tecnologia.
+palavras relacionadas ao universo da tecnologia e programação.
 
 ## 🛠️ Tecnologias e Arquitetura
 
@@ -104,7 +104,9 @@ Entre os dados armazenados estão:
 - Tempos registrados durante as partidas.
 - Melhores resultados de cada jogador.
 
-> **⚠️ Observação:** o projeto possui finalidade acadêmica e demonstrativa. A autenticação e o armazenamento são realizados localmente.
+> [!WARNING]
+> **Observação:** O projeto possui finalidade acadêmica e demonstrativa. A autenticação e o armazenamento são realizados localmente.
+
 
 ---
 
