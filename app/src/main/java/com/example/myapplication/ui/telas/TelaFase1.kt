@@ -90,7 +90,7 @@ fun TelaFase1(
     val corCardGrid = Color(0xFFEBF3FB)
     val corDoProgresso = Color(0xFF00E676)
     val corVerdeDestaque = Color(0xFFA5D6A7)
-    val corAzulChip = Color(0xFFD6E8FA)
+    val corAzulChip = Color(0xFFBBDEFB)
 
     Column(
         modifier = Modifier
@@ -211,7 +211,7 @@ fun TelaFase1(
                             .background(
                                 when {
                                     estaEncontrada -> corVerdeDestaque
-                                    estaSelecionada -> Color(0xFF81C784)
+                                    estaSelecionada -> corAzulChip
                                     else -> Color.Transparent
                                 }
                             )

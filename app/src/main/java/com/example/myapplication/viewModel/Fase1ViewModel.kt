@@ -118,53 +118,69 @@ class Fase1ViewModel(
     }
 
     fun selecionarPosicao(posicao: Posicao) {
-        val selecionadasAtuais = _uiState.value.posicoesSelecionada.toMutableList()
 
-        if (selecionadasAtuais.contains(posicao)) {
-            selecionadasAtuais.remove(posicao)
+        val estado = _uiState.value
+
+        val selecionadas = estado.posicoesSelecionada.toMutableList()
+
+        if (posicao in selecionadas) {
+            selecionadas.remove(posicao)
         } else {
-            selecionadasAtuais.add(posicao)
+            selecionadas.add(posicao)
         }
 
-        _uiState.update { it.copy(posicoesSelecionada = selecionadasAtuais) }
+        _uiState.update {
+            it.copy(posicoesSelecionada = selecionadas)
+        }
 
-        verificarPalavraFormada(selecionadasAtuais)
+        verificarPalavraFormada(selecionadas)
     }
 
-    private fun verificarPalavraFormada(selecionadas: List<Posicao>) {
-        val estadoAtual = _uiState.value
 
-        for (palavra in estadoAtual.palavras) {
-            if (!palavra.encontrada && selecionadas.size == palavra.posicoes.size) {
-                val bateuTodasPosicoes = palavra.posicoes.all { selecionadas.contains(it) }
+    private fun verificarPalavraFormada(
+        selecionadas: List<Posicao>
+    ) {
 
-                if (bateuTodasPosicoes) {
-                    val novasPalavras = estadoAtual.palavras.map { p ->
-                        if (p.texto == palavra.texto) p.copy(encontrada = true) else p
-                    }
+        val estado = _uiState.value
+        val selecionadasSet = selecionadas.toSet()
 
-                    val novasEncontradas = estadoAtual.posicoesEncontradas.toMutableSet()
-                    novasEncontradas.addAll(palavra.posicoes)
+        val palavraEncontrada = estado.palavras.firstOrNull { palavra ->
 
-                    val vitoria = novasPalavras.all { it.encontrada }
-                    if (vitoria) {
-                        cronometroJob?.cancel()
-                        salvarProgressoNoBanco()
-                    }
+            !palavra.encontrada &&
+                    selecionadasSet == palavra.posicoes.toSet()
+        }
 
-                    _uiState.update {
-                        it.copy(
-                            palavras = novasPalavras,
-                            posicoesEncontradas = novasEncontradas,
-                            posicoesSelecionada = emptyList(),
-                            mensagemVitoria = vitoria
-                        )
-                    }
-                    break
+        if (palavraEncontrada != null) {
+
+            val novasPalavras = estado.palavras.map { palavra ->
+                if (palavra.texto == palavraEncontrada.texto) {
+                    palavra.copy(encontrada = true)
+                } else {
+                    palavra
                 }
+            }
+
+            val novasEncontradas =
+                estado.posicoesEncontradas + palavraEncontrada.posicoes
+
+            val vitoria = novasPalavras.all { it.encontrada }
+
+            _uiState.update {
+                it.copy(
+                    palavras = novasPalavras,
+                    posicoesEncontradas = novasEncontradas,
+                    posicoesSelecionada = emptyList(),
+                    mensagemVitoria = vitoria
+                )
+            }
+
+            if (vitoria) {
+                cronometroJob?.cancel()
+                salvarProgressoNoBanco()
             }
         }
     }
+
 
     private fun salvarProgressoNoBanco() {
         if (usuarioId <= 0) return
